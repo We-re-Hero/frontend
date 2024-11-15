@@ -1,7 +1,14 @@
-import React, { useEffect } from "react";
-import { View, Text, StyleSheet, Animated, Pressable } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Animated,
+  TouchableOpacity,
+  ScrollView,
+} from "react-native";
 import Svg, { Circle, G } from "react-native-svg";
+import { Ionicons } from "@expo/vector-icons";
 
 const RADIUS = 45;
 const STROKE_WIDTH = 10;
@@ -10,6 +17,14 @@ const CIRCLE_LENGTH = 2 * Math.PI * RADIUS;
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
 export default function HomeScreen() {
+  const CURRENT_MONTH = "11월";
+  const [todos] = useState([
+    { id: 1, text: "동대구시장까지 1시간 산책하기", completed: false },
+    { id: 2, text: "자기 전 30분 명상하기", completed: true },
+    { id: 3, text: "AI 추천 활동 받기", completed: false },
+    { id: 4, text: "스크린 타임 분석하기", completed: false },
+  ]);
+
   // Animation values for each ring
   const urgentProgress = new Animated.Value(0);
   const routineProgress = new Animated.Value(0);
@@ -52,9 +67,9 @@ export default function HomeScreen() {
   });
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.header}>
-        {/* Calendar Strip */}
+        <Text style={styles.monthText}>{CURRENT_MONTH}</Text>
         <View style={styles.calendar}>
           {[13, 14, 15, 16, 17, 18, 19].map((day, index) => (
             <View
@@ -71,11 +86,9 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* Progress Rings */}
       <View style={styles.ringsContainer}>
         <Svg width={200} height={200} style={styles.svg}>
           <G rotation="-90" origin="100, 100">
-            {/* Background circles */}
             <Circle
               cx="100"
               cy="100"
@@ -101,7 +114,6 @@ export default function HomeScreen() {
               fill="transparent"
             />
 
-            {/* Animated progress circles */}
             <AnimatedCircle
               cx="100"
               cy="100"
@@ -138,7 +150,6 @@ export default function HomeScreen() {
           </G>
         </Svg>
 
-        {/* Legend */}
         <View style={styles.legend}>
           <View style={styles.legendItem}>
             <View style={[styles.legendDot, { backgroundColor: "#FF5252" }]} />
@@ -155,23 +166,32 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* Todo List */}
       <View style={styles.todoContainer}>
-        <Text style={styles.todoTitle}>To-Do List</Text>
-        <View style={styles.todoItem}>
-          <Text>동대구시장까지 1시간 산책하기</Text>
-        </View>
-        <View style={styles.todoItem}>
-          <Text>자기 전 30분 명상하기</Text>
-        </View>
-        <Pressable style={styles.aiButton}>
-          <Text style={styles.aiButtonText}>AI 추천 활동 받기</Text>
-        </Pressable>
-        <Pressable style={styles.screenButton}>
-          <Text style={styles.screenButtonText}>스크린 타임 분석하기</Text>
-        </Pressable>
+        <Text style={styles.todoTitle}>오늘의 할 일</Text>
+        {todos.map((todo) => (
+          <View key={todo.id} style={styles.todoItem}>
+            <TouchableOpacity
+              style={[
+                styles.checkbox,
+                todo.completed && styles.checkboxChecked,
+              ]}
+            >
+              {todo.completed && (
+                <Ionicons name="checkmark" size={18} color="white" />
+              )}
+            </TouchableOpacity>
+            <Text
+              style={[
+                styles.todoText,
+                todo.completed && styles.todoTextCompleted,
+              ]}
+            >
+              {todo.text}
+            </Text>
+          </View>
+        ))}
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
@@ -183,6 +203,11 @@ const styles = StyleSheet.create({
   header: {
     paddingTop: 50,
     paddingHorizontal: 20,
+  },
+  monthText: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 10,
   },
   calendar: {
     flexDirection: "row",
@@ -239,9 +264,32 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   todoItem: {
-    padding: 15,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#F0F0F0",
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#CCC",
+    marginRight: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  checkboxChecked: {
+    backgroundColor: "#2E7D32",
+    borderColor: "#2E7D32",
+  },
+  todoText: {
+    fontSize: 16,
+  },
+  todoTextCompleted: {
+    textDecorationLine: "line-through",
+    color: "#888",
   },
   aiButton: {
     backgroundColor: "#e8f5e9",
